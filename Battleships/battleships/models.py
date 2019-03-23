@@ -1,6 +1,8 @@
 from django.db import models
 from random import randint
 
+
+
 class Player(models.Model):
     """A very disposable player class. At some point we will probably link these players to Django users, but
     that will complicate API design for students, so starting here.
@@ -9,9 +11,13 @@ class Player(models.Model):
     created     When the player was created
     modified    When the player was last modified"""
 
-    name = models.CharField(max_length="50", unique=True)
+    name = models.CharField(max_length=50, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
 
 
 class Game(models.Model):
@@ -26,15 +32,19 @@ class Game(models.Model):
     players             The Players in the game
     """
 
-    name = models.CharField(max_length="50", unique=True)
+    name = models.CharField(max_length=50, unique=True)
     maximum_x = models.IntegerField(default=30)
     maximum_y = models.IntegerField(default=30)
     ships_per_person = models.IntegerField(default=3)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     players = models.ManyToManyField(Player)
-    
-    
+
+
+    def __str__(self):
+        return self.name
+
+        
     def create_ship(self, player, ship_length=3):
         """A function to automatically generate ships for the players"""
 
@@ -62,18 +72,10 @@ class Game(models.Model):
                 # Track this choice
                 start_locations_tried.append((startx, starty))
 
-            for x in range(0, ship_length):
-                if orientation == 1:
+            #for x in range(0, ship_length):
+                #if orientation == 1:
 
 
-
-
-
-
-
-
-
-    
     def number_of_ships(self, player):
         """Return the number of active ships for a given player"""
         return len(Ships.objects.all().filter(game=self).filter(player=player))
@@ -100,10 +102,11 @@ class Ship(models.Model):
     locations   The grid cells occupied by the ship"""
 
 
-    name = models.CharField(max_length="50")
-    game = models.ForeignKey(Game, on_delete=models.SET_NULL)
-    player = models.ForeignKey(Player, on_delete=models.SET_NULL)
-    locations = models.ManyToManyField(Location)
+    name = models.CharField(max_length=50)
+    #Set the on_delete actions to be CASCADE as my virtual env was saying the are not nullable
+    #and Cascade seems to achieve what we want unless I misunderstood
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
 
 
 
@@ -117,8 +120,6 @@ class Action(models.Model):
     location  The location of the attempted hit
     result    A short text description of the outcome"""
 
-    game = models.ForeignKey(Game, on_delete=models.SET_NULL)
-    player = models.ForeignKey(Player, on_delete=models.SET_NULL)
-    result = models.CharField(max_length="50")
-    
-    
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    result = models.CharField(max_length=50)
