@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-#from django.conf.urls import url
+from django.conf.urls import url
 
 from Battleships.battleships import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('admin/', admin.site.urls),
+    url(r'^$', views.homepage, name='homepage'),
+
+    url(r'^games/(?P<pk>\d+)/$', views.game_players, name='game_players'),
+
+    url(r'^admin/', admin.site.urls),
+
 ]

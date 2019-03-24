@@ -1,5 +1,6 @@
 from django.db import models
 from random import randint
+from django.contrib.auth.models import User
 
 
 
@@ -28,7 +29,8 @@ class Game(models.Model):
     maximum_y           The largest possible y value
     ships_per_person    The number of ships to generate for each player
     created             When the game was created
-    modified            When the game was last modified / accessed
+    created_by          Who created the game
+    last_modified       When the game was last modified / accessed
     players             The Players in the game
     """
 
@@ -37,14 +39,15 @@ class Game(models.Model):
     maximum_y = models.IntegerField(default=30)
     ships_per_person = models.IntegerField(default=3)
     created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, null=True, related_name='+', on_delete=models.SET_NULL)
+    last_modified = models.DateTimeField(auto_now=True)
     players = models.ManyToManyField(Player)
 
 
     def __str__(self):
         return self.name
 
-        
+
     def create_ship(self, player, ship_length=3):
         """A function to automatically generate ships for the players"""
 
