@@ -1,5 +1,5 @@
 from django.db import models
-from random import randint
+from random import choice, randint
 
 class Player(models.Model):
     """A very disposable player class. At some point we will probably link these players to Django users, but
@@ -9,7 +9,7 @@ class Player(models.Model):
     created     When the player was created
     modified    When the player was last modified"""
 
-    name = models.CharField(max_length="50", unique=True)
+    name = models.CharField(max_length=50, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -26,7 +26,7 @@ class Game(models.Model):
     players             The Players in the game
     """
 
-    name = models.CharField(max_length="50", unique=True)
+    name = models.CharField(max_length=50, unique=True)
     maximum_x = models.IntegerField(default=30)
     maximum_y = models.IntegerField(default=30)
     ships_per_person = models.IntegerField(default=3)
@@ -35,6 +35,61 @@ class Game(models.Model):
     players = models.ManyToManyField(Player)
     
     
+    def _create_ship_check(self, orientation, player, start_location, ship_length, name="Unnamed"):
+        """Try to create a horizontal ship from a certain location to the right
+
+        orientation     One of "horizontal", "vertical" or "diagonal" with which to attempt to build the ship
+        player          The player who will own any created ship
+        start_location  A tuple (x,y) of the start position
+        ship_length     We will try to occupy this many cells to the right of the start_location
+        name            A name for any successfully created ship
+
+        returns a Ship that has been added to the database, or None otherwise
+        """
+
+        # If the orientiation is void, return None
+        # TODO: Consider raising an error perhaps?
+        if orientation not in ['horizontal', 'vertical', 'diagonal']:
+            return None
+
+        # Get the start coordinates from the tuple location
+        (startx, starty) = start_location
+
+        # Make a list of the potential locations the ship would occupy
+        possible_locations = []
+        if orientation == 'horizontal':
+            # Head to the right from the start location
+            for x in range(0, ship_length):
+                possible_locations.append((startx+x,starty))
+        if orientation == 'vertical':
+            # Head above the start location (if above is larger y)
+            for y in range(0, ship_length):
+                possible_locations.append((startx,starty+y))
+        if orientation == 'diagonal':
+            # Head to top right of start location
+            for xy in range(0, ship_length):
+                possible_locations.append((startx+xy,starty+xy))
+
+        # Check of any of these collide with existing ships
+        for location in possible_locations:
+            if self.check_for_hit((location)):
+                # Already a ship there, we can't create a new one
+                return None
+
+        # We had no collisions, so the space must be free, create the new ship
+        ship = Ship.objects.create(name="Unnamed",
+                            game=self,
+                            player=player)
+
+        # Save its locations, creating those in the Model layer
+        for (x,y) in possible_locations:
+            model_location = Location.objects.create(x=x,y=y)
+            ship.locations.add(model_location)
+        ship.save()
+
+        return ship
+
+
     def create_ship(self, player, ship_length=3):
         """A function to automatically generate ships for the players"""
 
@@ -42,15 +97,13 @@ class Game(models.Model):
         ships = Ship.objects.all().filter(game=self)
 
         # Pick an orientation
-        # orientation 1 = horizonal ship, 2 = vertical ship, 3 = diagonal
-        orientation = randint(1,3)
+        orientation = choice(['horizontal', 'vertical', 'diagonal'])
 
         # Maintain a list of tuples of possible starting points
         start_locations_tried = list()
-        done = False
 
         # Keep going till we have created the ship, or exhausted all possibilities
-        while not done and (start_locations_tried < (self.maximum_x * self.maximum_y)):
+        while  (start_locations_tried < (self.maximum_x * self.maximum_y)):
             # Pick a start location. This is naive at best
             startx = randint(1, self.maximum_x)
             starty = randint(1, self.maximum_y)
@@ -62,18 +115,28 @@ class Game(models.Model):
                 # Track this choice
                 start_locations_tried.append((startx, starty))
 
-            for x in range(0, ship_length):
-                if orientation == 1:
+            ship = self._create_ship_check(orientation, player, (startx, starty), ship_length)
+            if ship:
+                return ship
+
+        # Oops, we just couldn't fit in the ship
+        return None
 
 
+    def check_for_hit(self, location):
+        """Checks for any hit, returns the ship for any hit, or None otherwise"""
+
+        # Get all existing ships in this game
+        ships = Ship.objects.all().filter(game=self)
+
+        for ship in ships:
+            if ship.check_for_hit(location):
+                return ship
+
+        # Nothing?
+        return None
 
 
-
-
-
-
-
-    
     def number_of_ships(self, player):
         """Return the number of active ships for a given player"""
         return len(Ship.objects.all().filter(game=self).filter(player=player))
@@ -100,12 +163,19 @@ class Ship(models.Model):
     locations   The grid cells occupied by the ship"""
 
 
-    name = models.CharField(max_length="50")
-    game = models.ForeignKey(Game, on_delete=models.SET_NULL)
-    player = models.ForeignKey(Player, on_delete=models.SET_NULL)
+    name = models.CharField(max_length=50)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
     locations = models.ManyToManyField(Location)
 
+    def check_for_hit(self, location):
+        """Checks if the ship is on a given location and returns True or False"""
 
+        # Check if the passed in location is in the list of ship locations
+        if location in self.locations:
+            return True
+        else:
+            return False
 
 
 
@@ -117,8 +187,9 @@ class Action(models.Model):
     location  The location of the attempted hit
     result    A short text description of the outcome"""
 
-    game = models.ForeignKey(Game, on_delete=models.SET_NULL)
-    player = models.ForeignKey(Player, on_delete=models.SET_NULL)
-    result = models.CharField(max_length="50")
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    result = models.CharField(max_length=50)
     
     
