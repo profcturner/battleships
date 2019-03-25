@@ -50,10 +50,10 @@ class Game(models.Model):
         done = False
 
         # Keep going till we have created the ship, or exhausted all possibilities
-        while not done and len(start_locations_tried < (maximum_x * maximum_y)):
+        while not done and (start_locations_tried < (self.maximum_x * self.maximum_y)):
             # Pick a start location. This is naive at best
-            startx = randint(1, maximum_x)
-            starty = randint(1, maximum_y)
+            startx = randint(1, self.maximum_x)
+            starty = randint(1, self.maximum_y)
 
             if (startx, starty) in start_locations_tried:
                 # This one is used, go around the block
@@ -76,7 +76,7 @@ class Game(models.Model):
     
     def number_of_ships(self, player):
         """Return the number of active ships for a given player"""
-        return len(Ships.objects.all().filter(game=self).filter(player=player))
+        return len(Ship.objects.all().filter(game=self).filter(player=player))
 
 
 class Location(models.Model):
