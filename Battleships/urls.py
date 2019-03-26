@@ -21,6 +21,9 @@ from Battleships.battleships import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/1.0/games/index', views.api_games_index),
+    path('api/1.0/games/register/<name>', views.api_games_register),
+    path('api/1.0/<name>/add/<name1>&<name2>', views.api_games_add),
+    path('api/1.0/games/delete/<name>', views.api_games_delete),
     path('api/1.0/players/index', views.api_players_index),
     path('api/1.0/players/register/<name>', views.api_players_register),
     path('api/1.0/players/delete/<name>', views.api_players_delete),
