@@ -27,7 +27,7 @@ urlpatterns = [
     url(r'^api/1.0/games/index/$', views.api_games_index),
     url(r'^api/1.0/games/index/$', views.api_games_index),
     url(r'^api/1.0/players/index/$', views.api_players_index),
-    url(r'^api/1.0/players/register/(P?<name>\w+)/$', views.api_players_register),
-    url(r'^api/1.0/players/delete/(P?<name>\w+)/$', views.api_players_delete),
+    url(r'^api/1.0/players/register/(?P<name>\w+)/$', views.api_players_register),
+    url(r'^api/1.0/players/delete/(?P<name>\w+)/$', views.api_players_delete),
 
 ]
