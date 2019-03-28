@@ -22,12 +22,12 @@ from django.conf.urls import include, url
 from Battleships.battleships import views
 
 urlpatterns = [
-    
+
     url(r'^admin/', admin.site.urls),
-    url(r'^api/1.0/games/index', views.api_games_index),
-    url(r'^api/1.0/games/index', views.api_games_index),
-    url(r'^api/1.0/players/index', views.api_players_index),
-    url(r'^api/1.0/players/register/(P?<name>[A-Za-z_]+)', views.api_players_register),
-    url(r'^api/1.0/players/delete/(P?<name>[A-Za-z_]+)', views.api_players_delete),
+    url(r'^api/1.0/games/index/$', views.api_games_index),
+    url(r'^api/1.0/games/index/$', views.api_games_index),
+    url(r'^api/1.0/players/index/$', views.api_players_index),
+    url(r'^api/1.0/players/register/(P?<name>\w+)/$', views.api_players_register),
+    url(r'^api/1.0/players/delete/(P?<name>\w+)/$', views.api_players_delete),
 
 ]
