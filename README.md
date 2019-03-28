@@ -1,8 +1,8 @@
 # battleships
 
-A simple Battleships game server for educational use.
+A simple Battleships game server for educational use. The server will be written in Python (3) Django, and at least initially is intended to do little else other than expose basic information in text or encoded in JSON.
 
-The idea is to expose a simple API for students to write clients against.
+The idea is to expose a simple API for students to write clients against - this is initially aimed at my first year students learning Python, but there's no reason why the server could not provide an API for Android or any other platform. The API is deliberately naive, but the plan is to make the server more robust with rate limiting.
 
 ## API 1.0
 
