@@ -1,0 +1,40 @@
+{% load static %}<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Games</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  </head>
+  <body>
+    <div class="container">
+      <ol class="breadcrumb my-4">
+        <li class="breadcrumb-item active">All Active Games</li>
+      </ol>
+      <table class="table">
+        <thead class="thead-inverse">
+          <tr>
+            <th>Game</th>
+            <th>Players</th>
+            <th>Ships</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for game in games %}
+            <tr>
+              <td>
+                {{ game.name }}
+                <small class="text-muted d-block">{{ game.players }}</small>
+              </td>
+              <td class="align-middle">
+                {{ player.name }}
+              </td>
+              <td class="align-middle">
+                {{ game.number_of_ships }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

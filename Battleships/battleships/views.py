@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 import json
 
@@ -10,16 +10,20 @@ from django.core import serializers
 
 from django.template import loader
 
-from .models import Player
-from .models import Game
+from .models import Player, Game, Ship, Action
 
 # Create your views here.
+
+def homepage(request):
+    games = Game.objects.all()
+    return render(request, 'homepage.html', {'games': games})
+
 
 def api_players_index(request):
     """Show a list of players, encoded in JSON"""
 
     players = list(Player.objects.values())
-    return JsonResponse(players, safe=False)
+    return render(request, 'players.html', {'players': players})
 
 
 def api_players_register(request, name):
@@ -65,20 +69,52 @@ def api_games_delete(request, name):
         return JsonResponse(True, safe=False)
 
 
-def api_games_add(request, name, name1, name2):
+def api_games_add(request, game, name):
     """Attempt to add players to a game"""
 
-    game = Game.objects.get(name=name)
-    player1 = Player.objects.get(name=name1)
-    player2 = Player.objects.get(name=name2)
-    players = list(player1,player2)
+    game = Game.objects.get(name=game)
+    player = Player.objects.get(name=name)
 
-    if not player1:
-        return JsonResponse(False, safe=False)
-    if not player2:
+    if not player:
         return JsonResponse(False, safe=False)
     if not game:
         return JsonResponse(False, safe=False)
     else:
-        game.players=player1
+        game.players.set(player)
+        return JsonResponse(True, safe=False)
+
+
+def api_game_start(request, game):
+    """Attempt to start a game"""
+
+    game = Game.objects.get(name=game)
+
+    if not game:
+        return JsonResponse(False, safe=False)
+    else:
+        return JsonResponse(True, safe=False)
+
+
+def api_game_history(request, game):
+    """Attempt to show current moves in a game"""
+
+    game = Game.objects.get(name=game)
+
+    if not game:
+        return JsonResponse(False, safe=False)
+    else:
+        return JsonResponse(True, safe=False)
+
+
+def api_strike(request, game, player, x, y):
+    """Attempt to strike another player"""
+
+    game = Game.objects.get(name=game)
+    player = Player.objects.get(name=player)
+
+    if not player:
+        return JsonResponse(False, safe=False)
+    if not game:
+        return JsonResponse(False, safe=False)
+    else:
         return JsonResponse(True, safe=False)

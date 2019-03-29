@@ -15,17 +15,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
+from django.conf.urls import url
 
 from Battleships.battleships import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/1.0/games/index', views.api_games_index),
-    path('api/1.0/games/register/<name>', views.api_games_register),
-    path('api/1.0/<name>/add/<name1>&<name2>', views.api_games_add),
-    path('api/1.0/games/delete/<name>', views.api_games_delete),
-    path('api/1.0/players/index', views.api_players_index),
-    path('api/1.0/players/register/<name>', views.api_players_register),
-    path('api/1.0/players/delete/<name>', views.api_players_delete),
+
+    url(r'^admin/', admin.site.urls),
+
+    url(r'^home/', views.homepage),
+
+    url(r'^api/1.0/players/index', views.api_players_index),
+    url(r'^api/1.0/players/register/<name>', views.api_players_register),
+    url(r'^api/1.0/players/delete/<name>/<secret>', views.api_players_delete),
+
+    url(r'^api/1.0/games/index', views.api_games_index),
+    url(r'^api/1.0/games/register/<name>', views.api_games_register),
+    url(r'^api/1.0/games/delete/<name>/<secret>', views.api_games_delete),
+
+    url(r'^api/1.0/games/addplayer/<game>/<name>', views.api_games_add),
+    url(r'^api/1.0/games/start/<game>', views.api_game_start),
+    url(r'^api/1.0/games/history/<game>', views.api_game_history),
+    url(r'^api/1.0/strike/<game>/<player>/<x,y>/<secret>', views.api_strike),
 
 ]
