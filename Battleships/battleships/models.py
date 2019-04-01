@@ -182,11 +182,13 @@ class Ship(models.Model):
     def check_for_hit(self, location):
         """Checks if the ship is on a given location and returns True or False"""
 
+        (x, y) = location
         # Check if the passed in location is in the list of ship locations
-        if location in self.locations.all():
-            return True
-        else:
-            return False
+        for location in self.locations.all():
+            if x == location.x and y == location.y:
+                return True
+
+        return False
 
 
 
