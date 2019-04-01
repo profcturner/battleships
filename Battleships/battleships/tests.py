@@ -285,7 +285,8 @@ class ShipCreationTestCase(TestCase):
         for player in [p1, p2, p3]:
             # Create 3 ships for player
             for x in range(0, game.ships_per_person):
-                game.create_ship(player)
+                ship = game.create_ship(player)
+                self.assertIsInstance(ship, Ship)
 
             # Check that was successful, i.e. that all ships were added to the database
             self.assertEqual(game.ships_per_person, game.number_of_ships(player))
