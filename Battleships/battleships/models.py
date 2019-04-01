@@ -59,14 +59,24 @@ class Game(models.Model):
         possible_locations = []
         if orientation == 'horizontal':
             # Head to the right from the start location
+            if startx + ship_length > self.maximum_x:
+                # Not enough room
+                return None
             for x in range(0, ship_length):
                 possible_locations.append((startx+x,starty))
         if orientation == 'vertical':
             # Head above the start location (if above is larger y)
+            if starty + ship_length > self.maximum_y:
+                # Not enough room
+                return None
             for y in range(0, ship_length):
                 possible_locations.append((startx,starty+y))
         if orientation == 'diagonal':
             # Head to top right of start location
+            if startx + ship_length > self.maximum_x or starty + ship_length > self.maximum_y:
+                # Not enough room
+                return None
+
             for xy in range(0, ship_length):
                 possible_locations.append((startx+xy,starty+xy))
 
@@ -103,7 +113,7 @@ class Game(models.Model):
         start_locations_tried = list()
 
         # Keep going till we have created the ship, or exhausted all possibilities
-        while  (start_locations_tried < (self.maximum_x * self.maximum_y)):
+        while  (len(start_locations_tried) < (self.maximum_x * self.maximum_y)):
             # Pick a start location. This is naive at best
             startx = randint(1, self.maximum_x)
             starty = randint(1, self.maximum_y)
@@ -172,7 +182,7 @@ class Ship(models.Model):
         """Checks if the ship is on a given location and returns True or False"""
 
         # Check if the passed in location is in the list of ship locations
-        if location in self.locations:
+        if location in self.locations.all():
             return True
         else:
             return False
