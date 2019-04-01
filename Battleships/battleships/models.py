@@ -93,7 +93,7 @@ class Game(models.Model):
 
         # Save its locations, creating those in the Model layer
         for (x,y) in possible_locations:
-            model_location = Location.objects.create(x=x,y=y)
+            model_location = Location.objects.create(x=x,y=y,game=self)
             ship.locations.add(model_location)
         ship.save()
 
