@@ -212,6 +212,60 @@ class Game(models.Model):
         return ships.count()
 
 
+    def get_all_actions(self):
+        """Return all the actions associated with the game"""
+
+        return Action.objects.all().filter(game=self)
+
+
+    def get_ships_by_player(self):
+        """Get the list of active ships by player
+
+        returns a dict keyed by player, and with value the QuerySet of ships
+        """
+
+        ships_by_player = dict()
+        for player in self.players.all():
+            ships_by_player[player] = Ship.objects.all().filter(game=self).filter(player=player)
+
+        return ships_by_player
+
+
+    def get_winner(self):
+        """Check for any winner, returns a Player if so, or None otherwise"""
+
+        # TODO: This algorithm feels horribly convoluted...
+        ships_by_player = self.get_ships_by_player()
+
+        # If there are no players, give up now
+        if not len(ships_by_player):
+            return None
+
+        # Make a simpler list of tuples, [(player, number of ships)]
+        ship_numbers = []
+
+        for player, ships in ships_by_player.items():
+            ship_numbers.append((player, len(ships)))
+
+        # Sort them by descending numbers of ships (winners first)
+        ship_numbers = sorted(ship_numbers, key=lambda x: x[1], reverse=True)
+
+        # Get the top ranked player - it will be the first in the list
+        (top_player, top_player_ships) = ship_numbers[0]
+        # If they have no ships, then nobody has any, and nobody wins (maybe no ships have yet been created)
+        if not top_player_ships:
+            return None
+
+        # Ok, if anyone else has ships there is no winner yet, so return None
+        for x in range(1, len(ship_numbers)):
+            (player, player_ships) = ship_numbers[x]
+            if player_ships:
+                return None
+
+        # Nobody else had ships and the top_player did so we have a winner
+        return(top_player)
+
+
 class Location(models.Model):
     """A grid location. Mainly used to record ship cells, and strike attempts.
 
