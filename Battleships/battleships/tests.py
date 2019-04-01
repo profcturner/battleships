@@ -79,6 +79,57 @@ class GameStrikeTestCase(TestCase):
         self.assertEqual(0, Ship.objects.all().filter(game=game).count())
 
 
+    def test_turn_by_turn_success(self):
+        """Check players taking it in turn works correctly"""
+
+        game = Game.objects.get(name="test_game")
+        p1 = Player.objects.get(name="player1")
+        p2 = Player.objects.get(name="player2")
+        p3 = Player.objects.get(name="player3")
+
+        # Player 1 turn one
+        action = game.strike(p1, (1,1))
+        self.assertIsInstance(action, Action)
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
+
+        # Player 2 turn one
+        action = game.strike(p2, (2,1))
+        self.assertIsInstance(action, Action)
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
+
+        # Player 3 turn one
+        action = game.strike(p3, (3,1))
+        self.assertIsInstance(action, Action)
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
+
+        # Player 1 turn two
+        action = game.strike(p1, (4,1))
+        self.assertIsInstance(action, Action)
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
+
+
+    def test_turn_by_turn_failure(self):
+        """Check players taking it in turn works correctly"""
+
+        game = Game.objects.get(name="test_game")
+        p1 = Player.objects.get(name="player1")
+        p2 = Player.objects.get(name="player2")
+        p3 = Player.objects.get(name="player3")
+
+        # Player 1 turn one
+        action = game.strike(p1, (1,1))
+        self.assertIsInstance(action, Action)
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
+
+        # Player 2 turn one
+        action = game.strike(p2, (2,1))
+        self.assertIsInstance(action, Action)
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
+
+        # Player 1 tries to take turn two - should not be allowed
+        action = game.strike(p1, (3,1))
+        self.assertIsNone(action)
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
 
 
 class ShipCreationTestCase(TestCase):
