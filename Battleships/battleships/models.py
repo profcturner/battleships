@@ -87,7 +87,7 @@ class Game(models.Model):
                 return None
 
         # We had no collisions, so the space must be free, create the new ship
-        ship = Ship.objects.create(name="Unnamed",
+        ship = Ship.objects.create(name=name,
                             game=self,
                             player=player)
 
