@@ -1,6 +1,7 @@
 from django.db import models
 from random import choice, randint
 
+
 class Player(models.Model):
     """A very disposable player class. At some point we will probably link these players to Django users, but
     that will complicate API design for students, so starting here.
@@ -101,10 +102,11 @@ class Game(models.Model):
 
 
     def create_ship(self, player, ship_length=3):
-        """A function to automatically generate ships for the players"""
+        """A function to automatically generate a random ship for a player
 
-        # Get all existing ships
-        ships = Ship.objects.all().filter(game=self)
+        player          the Player object who should get the ship
+        ship_length     the number of locations the ship will occupy (3 by default)
+        """
 
         # Pick an orientation
         orientation = choice(['horizontal', 'vertical', 'diagonal'])
@@ -134,7 +136,10 @@ class Game(models.Model):
 
 
     def check_for_hit(self, location):
-        """Checks for any hit, returns the ship for any hit, or None otherwise"""
+        """Checks for any hit, returns the ship for any hit, or None otherwise
+
+        location    a location tuple (x,y) to check for a hit
+        """
 
         # Get all existing ships in this game
         ships = Ship.objects.all().filter(game=self)
@@ -151,10 +156,12 @@ class Game(models.Model):
         """Process an attempted strike from a specified player
 
         player      the player to take the action
-        location    the location to strike
+        location    the location to strike as a tuple (x,y)
 
         returns an Action is the strike was a valid attempt or None otherwise
         """
+
+        # TODO: Add secrets
 
         # If the player isn't in the game, stop now
         if player not in self.players.all():
@@ -184,6 +191,7 @@ class Game(models.Model):
             # It was a miss!
             result = f"That was a miss."
 
+        # Our input location is a tuple, but we need to convert it to a Location object
         (x, y) = location
         location_object = Location.objects.create(x=x, y=y, game=self)
         action = Action.objects.create(game=self, player=player, location=location_object, result=result)
@@ -191,9 +199,17 @@ class Game(models.Model):
         return action
 
 
-    def number_of_ships(self, player):
-        """Return the number of active ships for a given player"""
-        return len(Ship.objects.all().filter(game=self).filter(player=player))
+    def number_of_ships(self, player=None):
+        """Return the number of active ships
+
+        player      if supplied, only the ships for this player are counted, if None, all are counted
+        """
+
+        ships = Ship.objects.all().filter(game=self)
+        if player:
+            ships = ships.filter(player=player)
+
+        return ships.count()
 
 
 class Location(models.Model):
@@ -215,8 +231,7 @@ class Ship(models.Model):
     name        A name for the ship
     game        The game in which the ship exists
     player      The Player who owns the ship
-    locations   The grid cells occupied by the ship"""
-
+    locations   The grid cells occupied by the ship as Location objects"""
 
     name = models.CharField(max_length=50)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
@@ -226,6 +241,7 @@ class Ship(models.Model):
     def check_for_hit(self, location):
         """Checks if the ship is on a given location and returns True or False"""
 
+        # The input is a tuple, get the x and y coordinate
         (x, y) = location
         # Check if the passed in location is in the list of ship locations
         for location in self.locations.all():
@@ -233,7 +249,6 @@ class Ship(models.Model):
                 return True
 
         return False
-
 
 
 class Action(models.Model):
