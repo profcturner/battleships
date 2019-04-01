@@ -6,6 +6,88 @@ from .models import Location
 from .models import Player
 from .models import Ship
 
+
+class GameInformationTestCase(TestCase):
+    """Test the mechanisms for ship strikes"""
+    def setUp(self):
+
+        # Create a game
+        game = Game.objects.create(name="test_game")
+
+        # Create and add players
+        p1 = Player.objects.create(name="player1")
+        p2 = Player.objects.create(name="player2")
+        p3 = Player.objects.create(name="player3")
+
+        game.players.add(p1)
+        game.players.add(p2)
+        game.players.add(p3)
+
+        # Create a single ship
+        game._create_ship_check('horizontal', p1, (3, 3), 3, name="Enterprise")
+        game._create_ship_check('vertical', p1, (10, 3), 3, name="Defiant")
+        game._create_ship_check('diagonal', p2, (20, 3), 3, name="Xenophobe")
+        game._create_ship_check('horizontal', p2, (3, 10), 3, name="KillingTime")
+        game._create_ship_check('vertical', p3, (3, 20), 3, name="InsufficientGravitas")
+        game._create_ship_check('diagonal', p3, (3, 12), 3, name="MistakeNot")
+
+
+    def test_count_locations(self):
+        # Test that the ship locations were added, there should be 3
+        game = Game.objects.get(name="test_game")
+        p1 = Player.objects.get(name="player1")
+        enterprise = Ship.objects.get(name="Enterprise")
+        defiant = Ship.objects.get(name="Defiant")
+
+        ships_by_player = game.get_ships_by_player()
+        # There are three players, so there should be three items
+        self.assertEqual(3, len(ships_by_player))
+
+        for player, ships in ships_by_player.items():
+            # Check the key is a player
+            self.assertIsInstance(player, Player)
+            # And each should have 2 ships
+            self.assertEqual(2, len(ships))
+
+        # Delete a ship
+        enterprise.delete()
+
+        # Get the status again
+        ships_by_player = game.get_ships_by_player()
+        # There are three players, so there should still  be three items
+        self.assertEqual(3, len(ships_by_player))
+        # There should only be one ship left for player 1
+        self.assertEqual(1, ships_by_player[p1].count())
+
+        # Delete another ship
+        defiant.delete()
+
+        # Get the status again
+        ships_by_player = game.get_ships_by_player()
+        # There are three players, so there should still  be three items
+        self.assertEqual(3, len(ships_by_player))
+        # There should only be no ships left for player 1
+        self.assertEqual(0, ships_by_player[p1].count())
+
+
+    def test_for_winner(self):
+
+        game = Game.objects.get(name="test_game")
+        p1 = Player.objects.get(name="player1")
+
+        # There should not be a winner
+        winner=game.get_winner()
+        self.assertIsNone(winner)
+
+        # Delete everything but Enterprise
+        Ship.objects.all().filter(game=game).exclude(name="Enterprise").delete()
+        self.assertEqual(1, Ship.objects.all().filter(game=game).count())
+
+        # There should be a winner
+        winner=game.get_winner()
+        self.assertEqual(winner, p1)
+
+
 class GameStrikeTestCase(TestCase):
     """Test the mechanisms for ship strikes"""
     def setUp(self):
