@@ -155,13 +155,14 @@ class Game(models.Model):
 class Location(models.Model):
     """A grid location. Mainly used to record ship cells, and strike attempts.
 
-    x    The x location
-    y    The y location
+    x       The x location
+    y       The y location
+    game    The game with this this is associated (for ease of cleanup)
     """
 
     x = models.IntegerField()
     y = models.IntegerField()
-
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
 
 class Ship(models.Model):
