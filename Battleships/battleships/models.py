@@ -262,6 +262,6 @@ class Action(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    result = models.CharField(max_length=50)
-    
-    
+    result = models.CharField(max_length=100)
+    created = models.DateTimeField(auto_now_add=True)
+
