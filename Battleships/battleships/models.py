@@ -1,5 +1,5 @@
 from django.db import models
-from random import choice, randint
+from random import choice, randint, shuffle
 
 
 class Player(models.Model):
@@ -36,14 +36,14 @@ class Game(models.Model):
     players = models.ManyToManyField(Player)
     
     
-    def _create_ship_check(self, orientation, player, start_location, ship_length, name="Unnamed"):
+    def _create_ship_check(self, orientation, player, start_location, ship_length, name=None):
         """Try to create a horizontal ship from a certain location to the right
 
         orientation     One of "horizontal", "vertical" or "diagonal" with which to attempt to build the ship
         player          The player who will own any created ship
         start_location  A tuple (x,y) of the start position
         ship_length     We will try to occupy this many cells to the right of the start_location
-        name            A name for any successfully created ship
+        name            A name for any successfully created ship, None for a random choice
 
         returns a Ship that has been added to the database, or None otherwise
         """
@@ -88,6 +88,8 @@ class Game(models.Model):
                 return None
 
         # We had no collisions, so the space must be free, create the new ship
+        if not name:
+            name = self.get_random_ship_name()
         ship = Ship.objects.create(name=name,
                             game=self,
                             player=player)
@@ -264,6 +266,59 @@ class Game(models.Model):
 
         # Nobody else had ships and the top_player did so we have a winner
         return(top_player)
+
+
+    def get_random_ship_name(self):
+        """
+        Returns a random ship name, with thanks to Ian M. Banks
+
+        Feel free to add more
+        https://en.wikipedia.org/wiki/List_of_spacecraft_in_the_Culture_series
+
+        """
+
+        names = [
+            "Bora Horza Gobuchul",
+            "Determinist",
+            "Eschatologist",
+            "Irregular Apocalypse",
+            "No More Mr Nice Guy",
+            "Profit Margin",
+            "Nervous Energy",
+            "Prosthetic Conscience",
+            "Revisionist",
+            "Trade Surplus",
+            "The Ends Of Invention",
+            "Clear Air Turbulence",
+            "Little Rascal",
+            "So Much For Subtlety",
+            "Unfortunate Conflict Of Evidence",
+            "Youthful Indiscretion",
+            "Flexible Demeanour",
+            "Just Read The Instructions",
+            "Of Course I Still Love You",
+            "Zealot",
+            "Limiting Factor",
+            "Gunboat Diplomat",
+            "Kiss My Ass",
+            "Prime Mover",
+            "Screw Loose",
+            "Death And Gravity",
+            "Mistake Not...",
+        ]
+
+        # Shuffle the list
+        shuffle(names)
+
+        # Try them in turn
+        for name in names:
+            # Already used?
+            if not Ship.objects.all().filter(game=self).filter(name=name):
+                # No... use this one
+                return name
+
+        # If we are here, then we ran out within the game
+        return "Unavilable due to previous customer selection"
 
 
 class Location(models.Model):
