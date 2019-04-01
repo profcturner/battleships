@@ -147,6 +147,50 @@ class Game(models.Model):
         return None
 
 
+    def strike(self, player, location):
+        """Process an attempted strike from a specified player
+
+        player      the player to take the action
+        location    the location to strike
+
+        returns an Action is the strike was a valid attempt or None otherwise
+        """
+
+        # If the player isn't in the game, stop now
+        if player not in self.players.all():
+            return None
+
+        # If there are no ships, stop now
+        if not Ship.objects.all().filter(game=self).count():
+            return None
+
+        # Get actions to date
+        all_actions = Action.objects.all().filter(game=self)
+
+        # If the current player is already a move ahead of anyone else then we should disallow this attempt
+        number_of_player_actions = all_actions.filter(player=player).count()
+        for p in self.players.all():
+            if number_of_player_actions > all_actions.filter(player=p).count():
+                return None
+
+        # Check for any hit
+        ship = self.check_for_hit(location)
+        if ship:
+            # A ship was hit!
+            result = f"The ship {ship.name} belonging to {ship.player.name} was sunk!"
+            # Delete the ship from the database
+            ship.delete()
+        else:
+            # It was a miss!
+            result = f"That was a miss."
+
+        (x, y) = location
+        location_object = Location.objects.create(x=x, y=y, game=self)
+        action = Action.objects.create(game=self, player=player, location=location_object, result=result)
+
+        return action
+
+
     def number_of_ships(self, player):
         """Return the number of active ships for a given player"""
         return len(Ship.objects.all().filter(game=self).filter(player=player))
