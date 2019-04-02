@@ -1,6 +1,8 @@
 from django.db import models
 from random import choice, randint, shuffle
 
+import string
+
 
 class Player(models.Model):
     """A very disposable player class. At some point we will probably link these players to Django users, but
@@ -13,6 +15,32 @@ class Player(models.Model):
     name = models.CharField(max_length=50, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    def create_secret(self):
+        """Set a secret code for the current game and return that secret"""
+
+        # Alpha Numeric six digit string
+        alpha_numeric = string.ascii_letters + string.digits
+        secret = ''.join(choice(alpha_numeric) for i in range(6))
+
+        # Nuke any existing secrets
+        PlayerSecret.objects.all().filter(player=self).delete()
+        # Add the new secret
+        PlayerSecret.objects.create(player=self, secret=secret)
+
+        return secret
+
+    def get_secret(self):
+        """Fetch any secret and return it, if none exists return None"""
+
+        player_secrets = PlayerSecret.objects.all().filter(player=self)
+
+        if not player_secrets.count():
+            # There's no secret
+            return None
+        else:
+            # Return the secret, there shouldn't be more than one, but return the first
+            return player_secrets[0].secret
 
 
 class Game(models.Model):
@@ -34,8 +62,36 @@ class Game(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     players = models.ManyToManyField(Player)
-    
-    
+
+
+    def create_secret(self):
+        """Set a secret code for the current game and return that secret"""
+
+        # Alpha Numeric six digit string
+        alpha_numeric = string.ascii_letters + string.digits
+        secret = ''.join(choice(alpha_numeric) for i in range(6))
+
+        # Nuke any existing secrets
+        GameSecret.objects.all().filter(game=self).delete()
+        # Add the new secret
+        GameSecret.objects.create(game=self, secret=secret)
+
+        return secret
+
+
+    def get_secret(self):
+        """Fetch any secret and return it, if none exists return None"""
+
+        game_secrets = GameSecret.objects.all().filter(game=self)
+
+        if not game_secrets.count():
+            # There's no secret
+            return None
+        else:
+            # Return the secret, there shouldn't be more than one, but return the first
+            return game_secrets[0].secret
+
+
     def _create_ship_check(self, orientation, player, start_location, ship_length, name=None):
         """Try to create a horizontal ship from a certain location to the right
 
@@ -374,3 +430,28 @@ class Action(models.Model):
     result = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
 
+
+class PlayerSecret(models.Model):
+    """Records secrets for players, in a separate table for safety
+
+    The secret is created when players are created.
+
+    player  The Player for whom the secret applies
+    secret  A unique code used by the player for some API issues
+    """
+
+    player = models.OneToOneField(Player, on_delete=models.CASCADE)
+    secret = models.CharField(max_length=20)
+
+
+class GameSecret(models.Model):
+    """Records secrets for games, in a separate table for safety
+
+    The secret is created when games are created.
+
+    game    The Player for whom the secret applies
+    secret  A unique code used by the player for some API issues
+    """
+
+    game = models.OneToOneField(Game, on_delete=models.CASCADE)
+    secret = models.CharField(max_length=20)
