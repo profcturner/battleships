@@ -218,11 +218,17 @@ class ShipCreationTestCase(TestCase):
     """Test the mechanisms for ship creation"""
     def setUp(self):
 
-        Game.objects.create(name="test_game")
+        game = Game.objects.create(name="test_game")
 
-        Player.objects.create(name="player1")
-        Player.objects.create(name="player2")
-        Player.objects.create(name="player3")
+        p1 = Player.objects.create(name="player1")
+        p2 = Player.objects.create(name="player2")
+        p3 = Player.objects.create(name="player3")
+
+        game.players.add(p1)
+        game.players.add(p2)
+        game.players.add(p3)
+
+        game.save()
 
 
     def test_horizontal_placement(self):
@@ -278,11 +284,8 @@ class ShipCreationTestCase(TestCase):
         """This creates a game and tests random ship generation for three ships for each of three players"""
 
         game = Game.objects.get(name="test_game")
-        p1 = Player.objects.get(name="player1")
-        p2 = Player.objects.get(name="player2")
-        p3 = Player.objects.get(name="player3")
 
-        for player in [p1, p2, p3]:
+        for player in game.players.all():
             # Create 3 ships for player
             for x in range(0, game.ships_per_person):
                 ship = game.create_ship(player)
