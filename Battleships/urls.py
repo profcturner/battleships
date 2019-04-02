@@ -24,10 +24,17 @@ from Battleships.battleships import views
 urlpatterns = [
 
     url(r'^admin/', admin.site.urls),
-    url(r'^api/1.0/games/index/$', views.api_games_index),
-    url(r'^api/1.0/games/index/$', views.api_games_index),
     url(r'^api/1.0/players/index/$', views.api_players_index),
-    url(r'^api/1.0/players/register/(?P<name>\w+)/$', views.api_players_register),
-    url(r'^api/1.0/players/delete/(?P<name>\w+)/$', views.api_players_delete),
+    url(r'^api/1.0/players/register/(?P<player_name>\w+)/$', views.api_players_register),
+    url(r'^api/1.0/players/delete/(?P<player_name>\w+)/(?P<secret>\w+)/$', views.api_players_delete),
+    url(r'^api/1.0/games/index/$', views.api_games_index),
+    url(r'^api/1.0/games/register/(?P<game_name>\w+)/$', views.api_games_register),
+    url(r'^api/1.0/games/delete/(?P<game_name>\w+)/(?P<secret>\w+)/$', views.api_games_delete),
+    url(r'^api/1.0/games/addplayer/(?P<game_name>\w+)/(?P<player_name>\w+)/$', views.api_games_add_player),
+    url(r'^api/1.0/games/start/(?P<game_name>\w+)/$', views.api_games_start_game),
+    url(r'^api/1.0/games/history/(?P<game_name>\w+)/$', views.api_games_history),
+    url(r'^api/1.0/games/getships/(?P<game_name>\w+)/(?P<player_name>\w+)/(?P<secret>\w+)/$', views.api_games_getships),
+    url(r'^api/1.0/games/getwinner/(?P<game_name>\w+)/$', views.api_games_getwinner),
+    url(r'^api/1.0/strike/(?P<game_name>\w+)/(?P<player_name>\w+)/\((?P<x>[0-9]+),(?P<y>[0-9]+)\)/(?P<secret>\w+)/$', views.api_strike),
 
 ]
