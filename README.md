@@ -20,4 +20,5 @@ In version 1.0 of the API, all URLs are prefixed with *api/1.0/*. URLs are shown
 | games/start/_game_/                      | Generate ships and start game                  |
 | games/history/_game_/                    | Show actions so far in game                    |
 | games/getships/_game_/_player_/_secret_/ | Get all the ships for a given player in a game |
+| games/getwinner/_game_/                  | Returns a winner, used to detect game over     |
 | strike/_game_/_player_/_(x,y)_/_secret_/ | Attempt to hit a grid square                   |
