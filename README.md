@@ -4,6 +4,8 @@ A simple Battleships game server for educational use. The server is written in P
 
 The idea is to expose a simple API for students to write clients against - this is initially aimed at my first year students learning Python, but there's no reason why the server could not provide an API for Android or any other platform. The API is deliberately naive, but the plan is to make the server more robust with rate limiting.
 
+Students may wish to read about HTTP response codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes and about Python and JSON https://www.w3schools.com/python/python_json.asp.
+
 ## API 1.0
 
 In version 1.0 of the API, all URLs are prefixed with *api/1.0/*. URLs are shown below, where data to be passed is shown _like so_. And a brief description of the function shown. More details to be added. All data is serialised using JSON. It is possible to use the response status code in many places to determine if the request is successful.
