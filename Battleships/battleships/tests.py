@@ -213,7 +213,7 @@ class GameStrikeTestCase(TestCase):
         # There should not be a hit
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"sunk", response.content)
+        self.assertIn(b"hit", response.content)
 
 
     def test_turn_by_turn_success_model(self):

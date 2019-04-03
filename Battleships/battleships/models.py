@@ -296,17 +296,21 @@ class Game(models.Model):
         ship = self.check_for_hit(location)
         if ship:
             # A ship was hit!
-            result = f"The ship {ship.name} belonging to {ship.player.name} was sunk!"
+            result = f"hit: ship {ship.name} belonging to {ship.player.name} was sunk."
             # Delete the ship from the database
             ship.delete()
         else:
             # It was a miss!
-            result = f"That was a miss."
+            result = f"miss:"
 
         # Our input location is a tuple, but we need to convert it to a Location object
         (x, y) = location
         location_object = Location.objects.create(x=x, y=y, game=self)
         action = Action.objects.create(game=self, player=player, location=location_object, result=result)
+
+        # Save both game and player to force modified timestamp update
+        self.save()
+        player.save()
 
         return action
 
