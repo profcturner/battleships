@@ -143,7 +143,7 @@ def api_games_add_player(request, game_name, player_name):
         if game and player:
             # Is it already there
             if player in game.players.all():
-                status_code = 200
+                status_code = 403
                 response = f"Player {player_name} is already in game {game_name}"
             else:
                 # Add it
@@ -226,7 +226,7 @@ def api_games_getships(request, game_name, player_name, secret):
                 status_code = 200
                 response = game.list_ships_by_player(player)
             else:
-                status_code = 404
+                status_code = 403
                 response = f"Invalid secret for player {player_name}"
 
         return JsonResponse(response, safe=False, status=status_code)
@@ -285,7 +285,7 @@ def api_strike(request, game_name, player_name, secret, x, y):
                 # Get the text from the output
                 response = game.strike(player, location).result
             else:
-                status_code = 404
+                status_code = 403
                 response = f"Invalid secret for player {player_name}"
 
         return JsonResponse(response, safe=False, status=status_code)
