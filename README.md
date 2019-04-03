@@ -160,6 +160,8 @@ From a web request point of view, hits and misses are considered successful.
 
 The server enforces a turn based system. In any given turn any player can act in any order. However, the system will prevent a player taking a further turn until their peers have caught up. The server will not allow strikes until ships have been created, and prohibits players not added into a game being allowed to strike.
 
+There is no protection against friendly fire.
+
 | outcome   | status code | content                                                         |
 |-----------|-------------|-----------------------------------------------------------------|
 | *success* | 200         | miss:                                                           |
