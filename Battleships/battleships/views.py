@@ -1,17 +1,20 @@
 
 from django.http import JsonResponse
+# We will sometimes raise exceptions
+from django.core.exceptions import PermissionDenied
 
 from .models import Player
 from .models import Game
-from .models import Ship
 
 # There are v1.0 APIs, all JSON encoded.
+# In many of these views all exceptions are caught, this is to avoid exposing them to hostile end users
+
 
 def api_players_index(request):
     """Show a list of games, encoded in JSON"""
 
     try:
-        players = list(Player.objects.values())
+        players = Player.list_players_as_dicts()
         response = players
         status_code = 200
     except:
@@ -67,7 +70,7 @@ def api_games_index(request):
     """Show a list of games"""
 
     try:
-        games = list(Game.objects.values())
+        games = Game.list_games_as_dicts()
         response = games
         status_code = 200
     except:
@@ -167,10 +170,7 @@ def api_games_start_game(request, game_name):
             response = f"Could not find game {game_name}"
         else:
             # Generate the ships
-            for player in game.players.all():
-                for x in range(0, game.ships_per_person):
-                    game.create_ship(player)
-                    #TODO: should check if some ships weren't made
+            game.start_game()
 
             status_code = 200
             response = f"Ships created, and game {game_name} started"
@@ -192,7 +192,7 @@ def api_games_history(request, game_name):
             status_code = 404
             response = f"Could not find game {game_name}"
         else:
-            response = list(game.get_all_actions().values())
+            response = game.list_actions_as_dicts()
             status_code = 200
 
         return JsonResponse(response, safe=False, status=status_code)
@@ -224,7 +224,7 @@ def api_games_getships(request, game_name, player_name, secret):
             # Check the secret
             if secret == player.get_secret():
                 status_code = 200
-                response = list(Ship.objects.all().filter(game=game).filter(player=player).values())
+                response = game.list_ships_by_player(player)
             else:
                 status_code = 404
                 response = f"Invalid secret for player {player_name}"
@@ -233,7 +233,7 @@ def api_games_getships(request, game_name, player_name, secret):
 
     except:
         status_code = 500
-        return JsonResponse("Unknown Error", safe=False, status=status_code)
+        return JsonResponse(response, safe=False, status=status_code)
 
 
 def api_games_getwinner(request, game_name):
@@ -248,12 +248,15 @@ def api_games_getwinner(request, game_name):
         else:
             status_code = 200
             response = game.get_winner()
+            if response:
+                # If it's not NULL, just get the name of the winner
+                response = response.name
 
         return JsonResponse(response, safe=False, status=status_code)
 
     except:
         status_code = 500
-        return JsonResponse("Unknown error", safe=False, status=status_code)
+        return JsonResponse(response, safe=False, status=status_code)
 
 
 def api_strike(request, game_name, player_name, secret, x, y):
@@ -279,14 +282,22 @@ def api_strike(request, game_name, player_name, secret, x, y):
                 status_code = 200
                 # Get the potential action and return
                 location = (int(x),int(y))
-                response = game.strike(player, location)
+                # Get the text from the output
+                response = game.strike(player, location).result
             else:
                 status_code = 404
                 response = f"Invalid secret for player {player_name}"
 
         return JsonResponse(response, safe=False, status=status_code)
 
+    except PermissionDenied as e:
+        # The model strike code can raise exceptions, for instance, if it isn't the players turn.
+        # Return the exception as a string so the client can deduce the reason
+        status_code = 403
+        return JsonResponse(str(e), safe=False, status=status_code)
+
     except:
+        # Anything else should be supressed for security reasons
         status_code = 500
         return JsonResponse(f"Unknown error: Strike game {game_name}, player {player_name}, location ({x}, {y})"
                             , safe=False, status=status_code)

@@ -1,7 +1,16 @@
-from django.db import models
+# Battleships models.py
+
+# From standard Python we will need some functions for randomness
 from random import choice, randint, shuffle
 
+# And strings
 import string
+
+# From Django we need model code
+from django.db import models
+
+# And we will sometimes raise exceptions
+from django.core.exceptions import PermissionDenied
 
 
 class Player(models.Model):
@@ -15,6 +24,26 @@ class Player(models.Model):
     name = models.CharField(max_length=50, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+
+    @staticmethod
+    def list_players_as_dicts():
+        """A list of players as dicts to be more easily serialisable
+
+        Currently contains only names
+
+        """
+
+        player_list = []
+        players = Player.objects.all()
+        for player in players:
+            player_dict = {
+                "name" : player.name
+            }
+            player_list.append(player_dict)
+
+        return player_list
+
 
     def create_secret(self):
         """Set a secret code for the current game and return that secret"""
@@ -64,6 +93,25 @@ class Game(models.Model):
     players = models.ManyToManyField(Player)
 
 
+    @staticmethod
+    def list_games_as_dicts():
+        """A list of players as dicts to be more easily serialisable
+
+        Currently contains only names
+
+        """
+
+        game_list = []
+        games = Game.objects.all()
+        for game in games:
+            game_dict = {
+                "name" : game.name
+            }
+            game_list.append(game_dict)
+
+        return game_list
+
+
     def create_secret(self):
         """Set a secret code for the current game and return that secret"""
 
@@ -90,6 +138,14 @@ class Game(models.Model):
         else:
             # Return the secret, there shouldn't be more than one, but return the first
             return game_secrets[0].secret
+
+
+    def start_game(self):
+        """Generate ships for all players in the game"""
+
+        for player in self.players.all():
+            for x in range(0, self.ships_per_person):
+                self.create_ship(player)
 
 
     def _create_ship_check(self, orientation, player, start_location, ship_length, name=None):
@@ -216,18 +272,16 @@ class Game(models.Model):
         player      the player to take the action
         location    the location to strike as a tuple (x,y)
 
-        returns an Action is the strike was a valid attempt or None otherwise
+        returns an Action is the strike was a valid attempt or an error string otherwise
         """
-
-        # TODO: Add secrets
 
         # If the player isn't in the game, stop now
         if player not in self.players.all():
-            return None
+            raise PermissionDenied("NotInGame")
 
         # If there are no ships, stop now
         if not Ship.objects.all().filter(game=self).count():
-            return None
+            raise PermissionDenied("NoShipsInGame")
 
         # Get actions to date
         all_actions = Action.objects.all().filter(game=self)
@@ -236,7 +290,7 @@ class Game(models.Model):
         number_of_player_actions = all_actions.filter(player=player).count()
         for p in self.players.all():
             if number_of_player_actions > all_actions.filter(player=p).count():
-                return None
+                raise PermissionDenied("NotYourTurn")
 
         # Check for any hit
         ship = self.check_for_hit(location)
@@ -270,10 +324,36 @@ class Game(models.Model):
         return ships.count()
 
 
-    def get_all_actions(self):
-        """Return all the actions associated with the game"""
+    def list_actions_as_dicts(self):
+        """Return all the actions associated with the game as a list of dicts"""
 
-        return Action.objects.all().filter(game=self)
+        action_list = []
+        actions = Action.objects.all().filter(game=self).order_by("created")
+        for action in actions:
+            action_dict = {
+                "game" : action.game.name,
+                "player" : action.player.name,
+                "location" : ((action.location.x, action.location.y)),
+                "result" : action.result,
+                "created" : action.created
+            }
+            action_list.append(action_dict)
+
+        return action_list
+
+
+    def list_ships_by_player(self, player):
+        """Return a list of ship objections as dicts for a given player"""
+
+        ships_list = []
+        ships = Ship.objects.all().filter(game=self).filter(player=player)
+        for ship in ships:
+            ship_dict = {
+                "name": ship.name,
+                "locations": ship.get_locations_as_tuples()
+            }
+            ships_list.append(ship_dict)
+        return ships_list
 
 
     def get_ships_by_player(self):
@@ -414,6 +494,16 @@ class Ship(models.Model):
                 return True
 
         return False
+
+    def get_locations_as_tuples(self):
+        """Return ship locations as a list of tuples (x,y)"""
+
+        locations_as_tuples = []
+
+        for location in self.locations.all():
+            locations_as_tuples.append((location.x, location.y))
+
+        return locations_as_tuples
 
 
 class Action(models.Model):
