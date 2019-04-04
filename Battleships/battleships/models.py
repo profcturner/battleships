@@ -72,6 +72,14 @@ class Player(models.Model):
             return player_secrets[0].secret
 
 
+    def __str__(self):
+        return self.name
+
+
+    class Meta:
+        ordering = ['name']
+
+
 class Game(models.Model):
     """A specific game between 2 or more players
 
@@ -461,6 +469,14 @@ class Game(models.Model):
         return "Unavilable due to previous customer selection"
 
 
+    def __str__(self):
+        return self.name
+
+
+    class Meta:
+        ordering = ['name']
+
+
 class Location(models.Model):
     """A grid location. Mainly used to record ship cells, and strike attempts.
 
@@ -472,6 +488,9 @@ class Location(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
 
 
 class Ship(models.Model):
@@ -509,6 +528,12 @@ class Ship(models.Model):
 
         return locations_as_tuples
 
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
 
 class Action(models.Model):
     """Records actions within a given game
@@ -524,6 +549,12 @@ class Action(models.Model):
     result = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"game: {self.game} result: {self.result}"
+
+    class Meta:
+        ordering = ['created']
+
 
 class PlayerSecret(models.Model):
     """Records secrets for players, in a separate table for safety
@@ -537,6 +568,9 @@ class PlayerSecret(models.Model):
     player = models.OneToOneField(Player, on_delete=models.CASCADE)
     secret = models.CharField(max_length=20)
 
+    def __str__(self):
+        return f"player: {self.player.name}, secret: {self.secret}"
+
 
 class GameSecret(models.Model):
     """Records secrets for games, in a separate table for safety
@@ -549,3 +583,6 @@ class GameSecret(models.Model):
 
     game = models.OneToOneField(Game, on_delete=models.CASCADE)
     secret = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"game: {self.game.name}, secret: {self.secret}"
