@@ -145,6 +145,12 @@ def api_games_add_player(request, game_name, player_name):
             if player in game.players.all():
                 status_code = 403
                 response = f"Player {player_name} is already in game {game_name}"
+
+            # Or are there already ships?
+            elif game.number_of_ships():
+                status_code = 403
+                response = "Game already started"
+
             else:
                 # Add it
                 game.players.add(player)
@@ -169,11 +175,17 @@ def api_games_start_game(request, game_name):
             status_code = 404
             response = f"Could not find game {game_name}"
         else:
-            # Generate the ships
-            game.start_game()
+            # Are there ships already?
+            if game.number_of_ships():
+                # Disallow further ship generation
+                status_code = 403
+                response = "GameAlreadyStarted"
+            else:
+                # Generate the ships
+                game.start_game()
 
-            status_code = 200
-            response = f"Ships created, and game {game_name} started"
+                status_code = 200
+                response = f"Ships created, and game {game_name} started"
 
         return JsonResponse(response, safe=False, status=status_code)
 

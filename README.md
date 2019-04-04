@@ -87,23 +87,25 @@ This API call deletes a game from the server. Note this will also delete ships b
 
 ### games/addplayer/_game_/_player_/
 
-This API call adds an existing player to an existing game. At this time the API does not prevent players being added midway into games. The name of the _game_ and _player_ should be entered as above.
+This API call adds an existing player to an existing game.  The name of the _game_ and _player_ should be entered as above. The API will not allow players to be added once the game is started and ships exist.
 
 | outcome   | status code | content                                                         |
 |-----------|-------------|-----------------------------------------------------------------|
 | *success* | 200         | Player _player_ added to game _game_                            |
 | *failure* | 403         | Player _player_ is already in game _game_                       |
+| *failure* | 403         | Game already started                                            |
 | *failure* | 404         | Could not find game _game_                                      |
 | *failure* | 404         | Could not find player _player_                                  |
 | *failure* | 500         | Unknown server error                                            |
 
 ### games/start/_game_/
 
-This API call generates random ships for all players currently registered in the game. At this time the API does not prevent repeated calls to this function and will generate more ships (if possible).
+This API call generates random ships for all players currently registered in the game. Calls when ships already exist will be rejected.
 
 | outcome   | status code | content                                                         |
 |-----------|-------------|-----------------------------------------------------------------|
 | *success* | 200         | Ships created and game _game_ started                           |
+| *failure* | 403         | Game already started                                            |
 | *failure* | 404         | Could not find game _game_                                      |
 | *failure* | 500         | Unknown server error                                            |
 
