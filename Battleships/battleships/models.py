@@ -71,6 +71,39 @@ class Player(models.Model):
             # Return the secret, there shouldn't be more than one, but return the first
             return player_secrets[0].secret
 
+    def get_colour(self):
+        """This will allocate a consistent colour to players based on the name.
+        This is used by the basic internal views to show consistent colours for given players
+        """
+
+        colours = [
+            'indianred',
+            'lightsalmon',
+            'darkred',
+            'pink',
+            'hotpink',
+            'orange',
+            'gold',
+            'khaki',
+            'plum',
+            'magenta',
+            'blueviolet',
+            'slateblue',
+            'lime',
+            'seagreen',
+            'teal',
+            'aqua',
+            'tan',
+            'brown',
+        ]
+
+        # Return a colour from the above list we get from a remainder when we divide the
+        # unique hash by the number of colours.
+        return colours[hash(self) % len(colours)]
+
+    def __hash__(self):
+        """Hash only on the name"""
+        return hash(self.name)
 
     def __str__(self):
         return self.name
@@ -451,7 +484,33 @@ class Game(models.Model):
             "Kiss My Ass",
             "Prime Mover",
             "Screw Loose",
+            "Bad for Business",
+            "Ablation",
+            "Arrested Development",
+            "A Series Of Unlikely Explanations",
+            "A Ship With A View",
+            "Big Sexy Beast",
+            "Boo!",
+            "Cantankerous",
+            "Credibility Problem",
+            "Dramatic Exit",
+            "Excuses and Accusations",
             "Death And Gravity",
+            "Anticipation Of A New Lover's Arrivel, The",
+            "Ethics Gradient",
+            "Honest Mistake",
+            "Limivorous",
+            "Uninvited Guest",
+            "Use Psychology",
+            "Yawning Angel",
+            "Zero Gravitas",
+            "Serious Callers Only",
+            "Steely Glint",
+            "Different Tan",
+            "Problem Child",
+            "Killing Time",
+            "Quietly Confident",
+            "Sleeper Service",
             "Mistake Not...",
         ]
 
@@ -466,7 +525,7 @@ class Game(models.Model):
                 return name
 
         # If we are here, then we ran out within the game
-        return "Unavilable due to previous customer selection"
+        return "Unavailable due to previous customer selection"
 
 
     def __str__(self):
