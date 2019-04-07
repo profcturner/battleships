@@ -6,6 +6,8 @@ The idea is to expose a simple API for students to write clients against - this 
 
 Students may wish to read about HTTP response codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes and about Python and JSON https://www.w3schools.com/python/python_json.asp.
 
+The code is written for Python Django, and needs Python 3.6 or higher.
+
 ## API 1.0
 
 In version 1.0 of the API, all URLs are prefixed with *api/1.0/*. URLs are shown below, where data to be passed is shown _like so_. And a brief description of the function shown. More details to be added. All data is serialised using JSON. It is possible to use the response status code in many places to determine if the request is successful.
