@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Game</title>
+</head>
+<body>
+
+<p><strong>View "{{ game.name }}", Last modified {{ game.modified }}</strong></p>
+
+<p>{{ game.players.count }} Players:
+
+{% for player in game.players.all %}
+    <strong><span style="color:{{ player.get_colour }}">"{{ player.name }}"</span></strong> &nbsp; &nbsp;
+{% endfor %}
+</p>
+
+<h2>Grid View</h2>
+
+<table border="1">
+    <tr>
+        <th></th>
+        {% for i in xrange %}
+            <th width="20px">{{ forloop.counter }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in grid %}
+    <tr>
+        <th height="20px">{{ forloop.counter }}</th>
+        {% for cell in row %}
+        {% if cell %}
+         <td bgcolor="{{ cell.player.get_colour }}" style="text-align:center">
+             <span title="{{ cell.name }} ({{ cell.player }})">&#9634;</span>
+         </td>
+         {% else %}
+            <td bgcolor="lightgray"></td>
+         {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+
+</table>
+
+<h2>Actions</h2>
+{% if actions %}
+    <table border="1">
+    <tr><th>Player</th><th>Location</th><th>Result</th><th>When</th></tr>
+{% for action in actions %}
+    <tr>
+    <td>{{ action.player.name }}</td>
+    <td>{{ action.location }}</td>
+    <td>{{ action.result }}</td>
+    <td>{{ action.created }}</td>
+    </tr>
+{% endfor %}
+    </table>
+{% else %}
+    <p>No actions taken yet.</p>
+{% endif %}
+
+
+<h2>{{ ships.count }} Ships</h2>
+{% if ships %}
+    <table border="1">
+    <tr><th>Player</th><th>Name</th><th>Locations</th></tr>
+
+{% for ship in ships %}
+    <tr>
+    <td>{{ ship.name }}</td>
+    <td>{{ ship.player }}</td>
+    <td>
+        {% for location in ship.locations.all %}
+            {{ location }}
+        {% endfor %} <br/>
+    </td>
+    </tr>
+{% endfor %}
+    </table>
+{% else %}
+    <p>There are no ships.</p>
+{% endif %}
+
+</body>
+</html>

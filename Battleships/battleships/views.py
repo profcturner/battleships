@@ -3,8 +3,17 @@ from django.http import JsonResponse
 # We will sometimes raise exceptions
 from django.core.exceptions import PermissionDenied
 
+from django.shortcuts import get_object_or_404, render
+
+# Permission decorators
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template import RequestContext, loader
+
+from .models import Action
 from .models import Player
 from .models import Game
+from .models import Ship
 
 # There are v1.0 APIs, all JSON encoded.
 # In many of these views all exceptions are caught, this is to avoid exposing them to hostile end users
@@ -313,4 +322,47 @@ def api_strike(request, game_name, player_name, secret, x, y):
         status_code = 500
         return JsonResponse(f"Unknown error: Strike game {game_name}, player {player_name}, location ({x}, {y})"
                             , safe=False, status=status_code)
+
+
+@login_required
+def view_game(request, game_id, player_id=None):
+    """A simple view to watch a game, if player is specified, other player ships are not shown"""
+
+    # Get the game
+    game = get_object_or_404(Game, pk=game_id)
+
+    # Get the player if defined
+    if player_id:
+        player = get_object_or_404(Player, pk=player_id)
+    else:
+        player = None
+
+    # Get the ships, and filter by player if need be
+    ships = Ship.objects.all().filter(game=game).order_by("player")
+    if player:
+        ships = ships.filter(player=player)
+
+    # Get the history
+    actions = Action.objects.all().filter(game=game)
+
+    # Create a two dimensional list (this will be 0-29 / 0-29 probably)
+    grid = [[None] * game.maximum_x for i in range(game.maximum_y)]
+    # Populate it with the ships in any squares
+    for ship in ships:
+        for location in ship.locations.all():
+            # Subtract 1 because index starts from 0, locations from 1
+            grid[location.x-1][location.y-1] = ship
+
+    template = loader.get_template('view_game.html')
+    context = {
+        'game': game,
+        'player': player,
+        'ships': ships,
+        'actions': actions,
+        'grid': grid,
+        'xrange': range(0, game.maximum_x),
+        'yrange': range(0, game.maximum_y),
+    }
+    return HttpResponse(template.render(context, request))
+
 
