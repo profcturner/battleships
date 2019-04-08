@@ -324,17 +324,35 @@ def api_strike(request, game_name, player_name, secret, x, y):
                             , safe=False, status=status_code)
 
 
-@login_required
-def view_game(request, game_id, player_id=None):
-    """A simple view to watch a game, if player is specified, other player ships are not shown"""
+def view_game(request, game_name, player_name=None, secret=None):
+    """A simple view to watch a game, if player is specified, other player ships are not shown
+
+    game_name       the text key for the game (game.name)
+    player_name     the text key for the player (player.name)
+    secret          a secret to be checked for the player
+
+    If only game_name is specified this is a superuser only view, and requires prior login.
+    This is because this view shows all ships in the game.
+
+    If player_name is specified then this is a user level view, and a matching secret must be
+    given. This mode will restrict ships to those belonging to the player.
+
+    This view is intended to help students check their API, and even be able to play without
+    a complete API. It also allows admin users to see what's actual going on.
+
+    """
 
     # Get the game
-    game = get_object_or_404(Game, pk=game_id)
+    game = get_object_or_404(Game, name=game_name)
 
     # Get the player if defined
-    if player_id:
-        player = get_object_or_404(Player, pk=player_id)
+    if player_name:
+        player = get_object_or_404(Player, name=player_name)
+        if player.get_secret() != secret:
+            raise PermissionDenied("Invalid secret.")
     else:
+        if not request.user and not request.user.is_superuser:
+            raise PermissionDenied("Requires superuser access.")
         player = None
 
     # Get the ships, and filter by player if need be
