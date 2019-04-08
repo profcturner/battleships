@@ -126,8 +126,8 @@ class Game(models.Model):
     """
 
     name = models.CharField(max_length=50, unique=True)
-    maximum_x = models.IntegerField(default=30)
-    maximum_y = models.IntegerField(default=30)
+    maximum_x = models.IntegerField(default=15)
+    maximum_y = models.IntegerField(default=15)
     ships_per_person = models.IntegerField(default=3)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
