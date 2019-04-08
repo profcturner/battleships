@@ -30,9 +30,9 @@ class GameInformationTestCase(TestCase):
         # Create a single ship
         game._create_ship_check('horizontal', p1, (3, 3), 3, name="Enterprise")
         game._create_ship_check('vertical', p1, (10, 3), 3, name="Defiant")
-        game._create_ship_check('diagonal', p2, (20, 3), 3, name="Xenophobe")
-        game._create_ship_check('horizontal', p2, (3, 10), 3, name="KillingTime")
-        game._create_ship_check('vertical', p3, (3, 20), 3, name="InsufficientGravitas")
+        game._create_ship_check('diagonal', p2, (2, 3), 3, name="Xenophobe")
+        game._create_ship_check('horizontal', p2, (3, 1), 3, name="KillingTime")
+        game._create_ship_check('vertical', p3, (3, 8), 3, name="InsufficientGravitas")
         game._create_ship_check('diagonal', p3, (3, 12), 3, name="MistakeNot")
 
 
