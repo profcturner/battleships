@@ -349,8 +349,11 @@ def view_game(request, game_name, player_name=None, secret=None):
     if player_name:
         player = get_object_or_404(Player, name=player_name)
         if player.get_secret() != secret:
-            raise PermissionDenied("Invalid secret.")
+            # Superusers should be able to skip this (to show a student their own view, for instance).
+            if not request.user and not request.user.is_superuser:
+                raise PermissionDenied("Invalid secret.")
     else:
+        # Only superusers should be able to run to see all players
         if not request.user and not request.user.is_superuser:
             raise PermissionDenied("Requires superuser access.")
         player = None

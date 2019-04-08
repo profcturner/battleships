@@ -496,7 +496,7 @@ class Game(models.Model):
             "Dramatic Exit",
             "Excuses and Accusations",
             "Death And Gravity",
-            "Anticipation Of A New Lover's Arrivel, The",
+            "Anticipation Of A New Lover's Arrival, The",
             "Ethics Gradient",
             "Honest Mistake",
             "Limivorous",
