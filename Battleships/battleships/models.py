@@ -337,12 +337,12 @@ class Game(models.Model):
         ship = self.check_for_hit(location)
         if ship:
             # A ship was hit!
-            result = f"hit: ship {ship.name} belonging to {ship.player.name} was sunk."
+            result = "hit: ship {} belonging to {} was sunk.".format(ship.name, ship.player.name)
             # Delete the ship from the database
             ship.delete()
         else:
             # It was a miss!
-            result = f"miss:"
+            result = "miss:"
 
         # Our input location is a tuple, but we need to convert it to a Location object
         (x, y) = location
@@ -549,7 +549,7 @@ class Location(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"({self.x}, {self.y})"
+        return "({}, {})".format(self.x, self.y)
 
 
 class Ship(models.Model):
@@ -609,7 +609,7 @@ class Action(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"game: {self.game} result: {self.result}"
+        return "game: {} result: {}".format(self.game, self.result)
 
     class Meta:
         ordering = ['created']
@@ -628,7 +628,7 @@ class PlayerSecret(models.Model):
     secret = models.CharField(max_length=20)
 
     def __str__(self):
-        return f"player: {self.player.name}, secret: {self.secret}"
+        return "player: {}, secret: {}".format(self.player.name, self.secret)
 
 
 class GameSecret(models.Model):
@@ -644,4 +644,4 @@ class GameSecret(models.Model):
     secret = models.CharField(max_length=20)
 
     def __str__(self):
-        return f"game: {self.game.name}, secret: {self.secret}"
+        return "game: {}, secret: {}".format(self.game.name, self.secret)

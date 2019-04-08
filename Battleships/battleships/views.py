@@ -44,7 +44,7 @@ def api_players_register(request, player_name):
         # Signal that all went well
         status_code = 200
     except:
-        response = f"Could not create player {player_name}"
+        response = "Could not create player {}".format(player_name)
         status_code = 403
 
     return JsonResponse(response, safe=False, status=status_code)
@@ -58,16 +58,16 @@ def api_players_delete(request, player_name, secret):
         player = Player.objects.get(name=player_name)
         if not player:
             status_code = 404
-            response = f"Could not find player {player_name}"
+            response = "Could not find player {}".format(player_name)
         else:
             if secret != player.get_secret():
                 status_code = 403
-                response = f"Invalid secret"
+                response = "Invalid secret"
             else:
                 # We have a player and valid secret
                 player.delete()
                 status_code = 200
-                response = f"Player {player_name} deleted"
+                response = "Player {} deleted".format(player_name)
 
         return JsonResponse(response, safe=False, status=status_code)
     except:
@@ -100,7 +100,7 @@ def api_games_register(request, game_name):
         # Signal that all went well
         status_code = 200
     except:
-        response = f"Could not create game {game_name}"
+        response = "Could not create game {}".format(game_name)
         status_code = 403
 
     return JsonResponse(response, safe=False, status=status_code)
@@ -114,16 +114,16 @@ def api_games_delete(request, game_name, secret):
         game = Game.objects.get(name=game_name)
         if not game:
             status_code = 404
-            response = f"Could not find game {game_name}"
+            response = "Could not find game {}".format(game_name)
         else:
             if secret != game.get_secret():
                 status_code = 403
-                response = f"Invalid secret"
+                response = "Invalid secret"
             else:
                 # We have a player and valid secret
                 game.delete()
                 status_code = 200
-                response = f"Game {game_name} deleted"
+                response = "Game {} deleted".format(game_name)
 
         return JsonResponse(response, safe=False, status=status_code)
 
@@ -140,20 +140,20 @@ def api_games_add_player(request, game_name, player_name):
         game = Game.objects.get(name=game_name)
         if not game:
             status_code = 404
-            response = f"Could not find game {game_name}"
+            response = "Could not find game {}".format(game_name)
 
         # Fetch the player
         player = Player.objects.get(name=player_name)
         if not player:
             status_code = 404
-            response = f"Could not find player {player_name}"
+            response = "Could not find player {}".format(player_name)
 
         # Have we both?
         if game and player:
             # Is it already there
             if player in game.players.all():
                 status_code = 403
-                response = f"Player {player_name} is already in game {game_name}"
+                response = "Player {} is already in game {}".format(player_name, game_name)
 
             # Or are there already ships?
             elif game.number_of_ships():
@@ -165,7 +165,7 @@ def api_games_add_player(request, game_name, player_name):
                 game.players.add(player)
                 game.save()
                 status_code = 200
-                response = f"Player {player_name} added to {game_name}"
+                response = "Player {} added to {}".format(player_name, game_name)
 
         return JsonResponse(response, safe=False, status=status_code)
 
@@ -182,7 +182,7 @@ def api_games_start_game(request, game_name):
         game = Game.objects.get(name=game_name)
         if not game:
             status_code = 404
-            response = f"Could not find game {game_name}"
+            response = "Could not find game {}".format(game_name)
         else:
             # Are there ships already?
             if game.number_of_ships():
@@ -194,7 +194,7 @@ def api_games_start_game(request, game_name):
                 game.start_game()
 
                 status_code = 200
-                response = f"Ships created, and game {game_name} started"
+                response = "Ships created, and game {} started".format(game_name)
 
         return JsonResponse(response, safe=False, status=status_code)
 
@@ -211,7 +211,7 @@ def api_games_history(request, game_name):
         game = Game.objects.get(name=game_name)
         if not game:
             status_code = 404
-            response = f"Could not find game {game_name}"
+            response = "Could not find game {}".format(game_name)
         else:
             response = game.list_actions_as_dicts()
             status_code = 200
@@ -232,13 +232,13 @@ def api_games_getships(request, game_name, player_name, secret):
         game = Game.objects.get(name=game_name)
         if not game:
             status_code = 404
-            response = f"Could not find game {game_name}"
+            response = "Could not find game {}".format(game_name)
 
         # Fetch the player
         player = Player.objects.get(name=player_name)
         if not player:
             status_code = 404
-            response = f"Could not find player {player_name}"
+            response = "Could not find player {}".format(player_name)
 
         # Have we both?
         if game and player:
@@ -248,7 +248,7 @@ def api_games_getships(request, game_name, player_name, secret):
                 response = game.list_ships_by_player(player)
             else:
                 status_code = 403
-                response = f"Invalid secret for player {player_name}"
+                response = "Invalid secret for player {}".format(player_name)
 
         return JsonResponse(response, safe=False, status=status_code)
 
@@ -265,7 +265,7 @@ def api_games_getwinner(request, game_name):
         game = Game.objects.get(name=game_name)
         if not game:
             status_code = 404
-            response = f"Could not find game {game_name}"
+            response = "Could not find game {}".format(game_name)
         else:
             status_code = 200
             response = game.get_winner()
@@ -288,13 +288,13 @@ def api_strike(request, game_name, player_name, secret, x, y):
         game = Game.objects.get(name=game_name)
         if not game:
             status_code = 404
-            response = f"Could not find game {game_name}"
+            response = "Could not find game {}".format(game_name)
 
         # Fetch the player
         player = Player.objects.get(name=player_name)
         if not player:
             status_code = 404
-            response = f"Could not find player {player_name}"
+            response = "Could not find player {}".format(player_name)
 
         # Have we both?
         if game and player:
@@ -307,7 +307,7 @@ def api_strike(request, game_name, player_name, secret, x, y):
                 response = game.strike(player, location).result
             else:
                 status_code = 403
-                response = f"Invalid secret for player {player_name}"
+                response = "Invalid secret for player {}".format(player_name)
 
         return JsonResponse(response, safe=False, status=status_code)
 
@@ -320,7 +320,7 @@ def api_strike(request, game_name, player_name, secret, x, y):
     except:
         # Anything else should be supressed for security reasons
         status_code = 500
-        return JsonResponse(f"Unknown error: Strike game {game_name}, player {player_name}, location ({x}, {y})"
+        return JsonResponse("Unknown error: Strike game {}, player {}, location ({}, {})".format(game_name, player_name, x, y)
                             , safe=False, status=status_code)
 
 

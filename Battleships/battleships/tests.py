@@ -181,7 +181,7 @@ class GameStrikeTestCase(TestCase):
         # Test that the check_if_hit model logic
         p1 = Player.objects.get(name="player1")
         secret = p1.create_secret()
-        url = f"/api/1.0/strike/test_game/player1/(1,1)/{secret}/"
+        url = "/api/1.0/strike/test_game/player1/(1,1)/{}/".format(secret)
 
         client = Client()
         # There should not be a hit
@@ -207,7 +207,7 @@ class GameStrikeTestCase(TestCase):
         # Test a valid strike at the API client level
         p1 = Player.objects.get(name="player1")
         secret = p1.create_secret()
-        url = f"/api/1.0/strike/test_game/player1/(3,3)/{secret}/"
+        url = "/api/1.0/strike/test_game/player1/(3,3)/{}/".format(secret)
 
         client = Client()
         # There should not be a hit
@@ -255,30 +255,30 @@ class GameStrikeTestCase(TestCase):
         p2secret = p2.create_secret()
         p3 = Player.objects.get(name="player3")
         p3secret = p3.create_secret()
-        base_url = f"/api/1.0/strike/test_game"
+        base_url = "/api/1.0/strike/test_game"
         client = Client()
 
 
         # Player 1 turn one - miss
-        url = f"{base_url}/player1/(1,1)/{p1secret}/"
+        url = "{}/player1/(1,1)/{}/".format(base_url, p1secret)
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"miss", response.content)
 
         # Player 2 turn one - miss
-        url = f"{base_url}/player2/(2,1)/{p2secret}/"
+        url = "{}/player2/(2,1)/{}/".format(base_url, p2secret)
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"miss", response.content)
 
         # Player 3 turn one - miss
-        url = f"{base_url}/player3/(3,1)/{p3secret}/"
+        url = "{}/player3/(3,1)/{}/".format(base_url, p3secret)
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"miss", response.content)
 
         # Player 1 turn two - miss
-        url = f"{base_url}/player1/(4,1)/{p1secret}/"
+        url = "{}/player1/(4,1)/{}/".format(base_url, p1secret)
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"miss", response.content)
@@ -317,24 +317,24 @@ class GameStrikeTestCase(TestCase):
         p2secret = p2.create_secret()
         p3 = Player.objects.get(name="player3")
         p3secret = p3.create_secret()
-        base_url = f"/api/1.0/strike/test_game"
+        base_url = "/api/1.0/strike/test_game"
         client = Client()
 
 
         # Player 1 turn one - miss
-        url = f"{base_url}/player1/(1,1)/{p1secret}/"
+        url = "{}/player1/(1,1)/{}/".format(base_url, p1secret)
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"miss", response.content)
 
         # Player 2 turn one - miss
-        url = f"{base_url}/player2/(2,1)/{p2secret}/"
+        url = "{}/player2/(2,1)/{}/".format(base_url, p2secret)
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"miss", response.content)
 
         # Player 1 turn one - miss, but out of turn
-        url = f"{base_url}/player1/(3,1)/{p1secret}/"
+        url = "{}/player1/(3,1)/{}/".format(base_url, p1secret)
         response = client.get(url)
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"NotYourTurn", response.content)
