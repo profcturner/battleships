@@ -24,7 +24,8 @@ from Battleships.battleships import views
 urlpatterns = [
 
     url(r'^admin/', admin.site.urls),
-    url(r'^view_game/(?P<game_name>\w+)/$', views.view_game),
+    url(r'^$', views.index),
+    url(r'^view_game/(?P<game_name>\w+)/$', views.view_game, name="view_game"),
     url(r'^view_game/(?P<game_name>\w+)/(?P<player_id>\w+)/$', views.view_game),
     url(r'^view_game/(?P<game_name>\w+)/(?P<player_name>\w+)/(?P<secret>\w+)/$', views.view_game),
     url(r'^api/1.0/players/index/$', views.api_players_index),

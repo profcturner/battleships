@@ -324,6 +324,19 @@ def api_strike(request, game_name, player_name, secret, x, y):
                             , safe=False, status=status_code)
 
 
+def index(request):
+    """A main landing page."""
+
+    games = Game.objects.all()
+
+    template = loader.get_template('index.html')
+    context = {
+        'games': games,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+
 def view_game(request, game_name, player_name=None, secret=None):
     """A simple view to watch a game, if player is specified, other player ships are not shown
 

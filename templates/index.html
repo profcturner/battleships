@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Battleships!</title>
+</head>
+<body>
+
+<p>Welcome to this Battleships server, intended to provide a very simple API for a battleships game for students to study Client / Server relationships.</p>
+
+{% if games %}
+    <table border="1">
+        <tr><th>Game</th><th>Players</th><th>Last Action</th></tr>
+    {% for game in games %}
+        <tr>
+            <td><a href="{% url 'view_game' game.name %}">{{ game.name }}</a></td>
+        <td>
+            {% for player in game.players.all %}
+                <strong><span style="color:{{ player.get_colour }}">"{{ player.name }}"</span></strong> &nbsp; &nbsp;
+            {% endfor %}
+        </td>
+        <td>
+            {{ game.modified }}
+        </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% else %}
+<p>There are no games on this server yet.</p>
+{% endif %}
+
+
+<p>See the <a href="https://github.com/profcturner/battleships">GitHub project page for more details.</a></p>
+</body>
+</html>
