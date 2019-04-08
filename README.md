@@ -180,4 +180,29 @@ There is no protection against friendly fire.
 | *failure* | 404         | Could not find player _player_                                  |
 | *failure* | 500         | Unknown server error                                            |
 
+## HTML views
+
+There is currently a single html web page provided to help admins, and potentially players and students.
+
+### <BASE_URL>/view_game/_game_/_player_/_secret_/
+
+Note that this is *not* in the API tree, this URL goes straight onto your base url for the server.
+
+Superusers who have logged in can use this to view any game and can omit the _player_ and _secret_ variables. If a superuser uses the _player_ variable they do not have to use the secret, in case they want to demonstrate something to a student.
+
+Normal users must specify all parts and only that player's ships in the game will be displayed.
+
+## Creating a Superuser
+
+When installing the software
+
+python3 manage.py createsuperuser
+
+will allow you to create a superuser account.
+
+## Django Admin pages
+
+Superusers can access the Django admin interface at <BASE_URL>/admin/ which can allow you to delete and create items as needed within the database without using the API. Note that this bypasses any API logic.
+
+
 
