@@ -99,11 +99,8 @@ class Player(models.Model):
 
         # Return a colour from the above list we get from a remainder when we divide the
         # unique hash by the number of colours.
-        return colours[hash(self) % len(colours)]
+        return colours[hash(self.name) % len(colours)]
 
-    def __hash__(self):
-        """Hash only on the name"""
-        return hash(self.name)
 
     def __str__(self):
         return self.name
