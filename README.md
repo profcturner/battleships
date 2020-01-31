@@ -192,13 +192,31 @@ Superusers who have logged in can use this to view any game and can omit the _pl
 
 Normal users must specify all parts and only that player's ships in the game will be displayed.
 
+## Installing This Software
+
+This package requires Python 3.6+ and Django. Installing these on a production server isn't so hard, but beyond the scope of this documentation. Google is your friend here.
+
+To install in a development environment, again you'll need Python and Django (and maybe git or GitHub to easily clone or fork the code). The details vary by OS and circumstance, but you may want to Google using pip or pip3 to install Django once you have Python. You may also want to explore the pros and cons of using a venv.
+
 ## Creating a Superuser
 
-When installing the software
+Once installed, you probably want to create a superuser, find the directory containing manage.py and use this command.
 
+```
 python3 manage.py createsuperuser
+```
 
 will allow you to create a superuser account.
+
+```
+python3 manage.py runserver
+```
+
+will allow you to run a test server instance to play with.
+
+You only need a superuser to manipulate the database directly, but it also allows an admin view of games that can be useful. For instance, in the main games list the games are hyperlinked, but the admin view is protected for obvious reasons (it shows all ship positions).
+
+Go to the /admin/ directory of your project to get a login prompt. Once logged in go back to the main directory. Now you will be able to view games that are linked with more details.
 
 ## Django Admin pages
 
