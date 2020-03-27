@@ -130,7 +130,7 @@ class Game(models.Model):
     modified = models.DateTimeField(auto_now=True)
     players = models.ManyToManyField(Player)
 
-
+    # Test comment
     @staticmethod
     def list_games_as_dicts():
         """A list of players as dicts to be more easily serialisable
