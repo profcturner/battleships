@@ -20,4 +20,5 @@
 
 ## Start server
 1. `python manage.py runserver`
-2. you will get a URL on where to reach admin pages
+2. if want to use on multiple devices, add the server machine's local IP address to Battleships.settings.ALLOWED_HOSTS    
+3. you will get a URL on where to reach admin pages
