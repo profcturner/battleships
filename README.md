@@ -198,6 +198,14 @@ This package requires Python 3.6+ and Django. Installing these on a production s
 
 To install in a development environment, again you'll need Python and Django (and maybe git or GitHub to easily clone or fork the code). The details vary by OS and circumstance, but you may want to Google using pip or pip3 to install Django once you have Python. You may also want to explore the pros and cons of using a venv.
 
+## Creating the Database
+
+You may wish to tweak the database server, but you can create the initial database with
+
+```
+python3 manage.py migrate
+```
+
 ## Creating a Superuser
 
 Once installed, you probably want to create a superuser, find the directory containing manage.py and use this command.
